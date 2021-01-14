@@ -1,12 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpService,
+  Injectable,
+  NotFoundException,
+  Logger,
+} from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { CreateAppDto } from './dto/CreateAppDto.dto';
 import { EditAppDto } from './dto/EditAppDto.dto';
+import { InstagramTokenDto } from './dto/InstagramTokenDto';
 
 export interface Application {
   id: number;
   name: string;
   token: string;
-  expireAt: number;
   createdAt: number;
 }
 
@@ -18,10 +24,11 @@ export class ApplicationsService {
       id: 0,
       name: 'lw',
       token: 'asdasd212',
-      expireAt: 3600,
       createdAt: 0,
     },
   ];
+
+  constructor(private httpService: HttpService) {}
 
   async getAll() {
     return this.applications;
@@ -48,7 +55,6 @@ export class ApplicationsService {
       id: Math.round(Math.random() * 1000),
       name: newApp.name,
       token: newApp.token,
-      expireAt: 0,
       createdAt: Date.now(),
     };
     this.applications.push(app);
@@ -66,8 +72,34 @@ export class ApplicationsService {
     this.applications = this.applications.filter((app) => app.id !== id);
   }
 
-  async refreshToken(name: string) {
-    // TODO: request to https://developers.facebook.com/docs/instagram-basic-display-api/guides/long-lived-access-tokens/
-    return name;
+  /**
+   * Refresh token of given app by a request to Instagram API
+   * https://developers.facebook.com/docs/instagram-basic-display-api/guides/long-lived-access-tokens/
+   * @param app - app whose token needs to be refreshed
+   */
+  async refreshToken(app: Application) {
+    try {
+      const response = await this.httpService
+        .get<InstagramTokenDto>(
+          `https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=${app.token}`,
+        )
+        .toPromise();
+
+      app.token = response.data.access_token;
+      Logger.log(`CRON: Refreshed ${app.name} token`);
+    } catch (err) {
+      Logger.error(`CRON: ${app.name} refresh failed!`);
+      Logger.error(err);
+    }
+  }
+
+  @Cron(CronExpression.EVERY_WEEK)
+  async refreshTokens() {
+    Logger.log('CRON: Started token refresh');
+    const apps = await this.getAll();
+
+    await Promise.all(apps.map((app) => this.refreshToken(app)));
+
+    Logger.log('CRON: Finished token refresh');
   }
 }
