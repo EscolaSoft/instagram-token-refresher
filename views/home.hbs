@@ -1,16 +1,14 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>App</title>
-    <link rel="stylesheet" href="index.css">
-  </head>
-  <body>
-    Logged user:
-    {{ user }}
+<a href="/add">Add application</a>
+<ul class="people_list">
+  {{#each apps}}
+    <li>
+      <b>{{ this.name }}</b>
+      <a href="/edit/{{ this.id }}">edit</a>
+      <form method="post" action="/applications/{{ this.id }}/delete"><button>Delete</button></form>
+    </li>
+  {{/each}}
+</ul>
 
-    <br>
-    <br>
-    <a href="/logout">Logout</a>
-  </body>
-</html>
+<br>
+<br>
+<a href="/logout">Logout</a>

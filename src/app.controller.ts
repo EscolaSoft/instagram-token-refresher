@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Param,
   Post,
   Render,
   Request,
@@ -9,9 +10,12 @@ import {
 } from '@nestjs/common';
 import { LoginGuard } from './common/guards/login.guard';
 import { AuthenticatedGuard } from './common/guards/authenticated.guard';
+import { ApplicationsService } from './applications/applications.service';
 
 @Controller()
 export class AppController {
+  constructor(private applicationsService: ApplicationsService) {}
+
   @Get()
   @Render('index')
   index() {
@@ -27,8 +31,25 @@ export class AppController {
   @UseGuards(AuthenticatedGuard)
   @Get('home')
   @Render('home')
-  async home(@Request() req) {
-    return { user: JSON.stringify(req.user) };
+  async home() {
+    const apps = await this.applicationsService.getAll();
+    return { apps };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('add')
+  @Render('add')
+  async add() {
+    return {};
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('edit/:id')
+  @Render('edit')
+  async edit(@Param('id') id) {
+    return {
+      app: await this.applicationsService.get(parseInt(id, 10)),
+    };
   }
 
   @UseGuards(AuthenticatedGuard)

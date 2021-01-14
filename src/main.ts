@@ -13,6 +13,7 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('hbs');
+  app.set('view options', { layout: 'main' });
 
   app.use(
     sassMiddleware({
@@ -32,6 +33,8 @@ async function bootstrap() {
 
   app.use(passport.initialize());
   app.use(passport.session());
+
+  app.enableCors();
 
   await app.listen(3000);
 }
