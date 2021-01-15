@@ -1,14 +1,25 @@
-<a href="/add">Add application</a>
-<ul class="people_list">
+<h2>Applications list</h2>
+<a href="/add" class="btn add-btn">Add new application</a>
+<ul class="apps">
   {{#each apps}}
     <li>
       <b>{{ this.name }}</b>
-      <a href="/edit/{{ this.id }}">edit</a>
-      <form method="post" action="/applications/{{ this.id }}/delete"><button>Delete</button></form>
+      <a href="/edit/{{ this.id }}" class="btn btn--action">Edit</a>
+      <form method="post" action="/applications/{{ this.id }}/delete"><button class="btn btn--action">Delete</button></form>
     </li>
   {{/each}}
 </ul>
 
+<p>
+  You can get the access token using following techniques:<br/>
+  <ul>
+    <li><code>{domain}/applications/{app_name}/token</code> -  get a JSON response with token</li>
+    <li><code>{domain}/applications/{app_name}/token.js</code> - a JavaScript variable declaration</li>
+  </ul>
+</p>
+
 <br>
 <br>
-<a href="/logout">Logout</a>
+<br>
+<br>
+<a href="/logout" class="btn logout-btn">Logout</a>

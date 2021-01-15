@@ -53,7 +53,7 @@ export class ApplicationsService {
   async create(newApp: CreateAppDto) {
     const app = {
       id: Math.round(Math.random() * 1000),
-      name: newApp.name,
+      name: this.transformName(newApp.name),
       token: newApp.token,
       createdAt: Date.now(),
     };
@@ -63,9 +63,13 @@ export class ApplicationsService {
 
   async edit(id: number, updatedApp: EditAppDto) {
     const app = await this.get(id);
-    app.name = updatedApp.name;
+    app.name = this.transformName(updatedApp.name);
     app.token = updatedApp.token || app.token;
     return app;
+  }
+
+  transformName(name: string) {
+    return name.toLowerCase().replace(/\s/, '-');
   }
 
   async delete(id: number) {

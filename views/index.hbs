@@ -1,7 +1,12 @@
-<form method="POST" action="/auth/login">
-  <label for="username">Username:</label>
-  <input type="text" name="username" value="admin"><br>
-  <label for="username">Password:</label>
-  <input type="password" name="password" value="password"><br>
-  <button>Login</button>
+<form method="POST" action="/auth/login" class="form">
+  <h2>Zaloguj się</h2>
+  <div class="input">
+    <label for="username">Username:</label>
+    <input type="text" name="username" value="admin" required />
+  </div>
+  <div class="input">
+    <label for="username">Password:</label>
+    <input type="password" name="password" value="password" required />
+  </div>
+  <button class="btn">Login</button>
 </form>

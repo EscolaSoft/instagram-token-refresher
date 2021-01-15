@@ -1,7 +1,11 @@
-<form method="POST" action="/applications/add">
-  <label for="username">Name:</label>
-  <input type="text" name="name"><br>
-  <label for="username">Initial LongLived Token:</label>
-  <input type="text" name="token"><br>
-  <button>Add</button>
+<form method="POST" action="/applications/add" class="form">
+  <div class="input">
+    <label for="username">Application name:</label>
+    <input type="text" name="name" required />
+  </div>
+  <div class="input">
+    <label for="username">Initial Long-Lived Access Token:</label>
+    <input type="text" name="token" required />
+  </div>
+  <button class="btn">Add application</button>
 </form>

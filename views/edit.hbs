@@ -1,8 +1,12 @@
-<form method="POST" action="/applications/{{ app.id }}/edit">
-  <input type="hidden" name="id" value="{{ app.id }}">
-  <label for="username">Name:</label>
-  <input type="text" name="name" value="{{ app.name }}"><br>
-  <label for="username">Initial LongLived Token:</label>
-  <input type="text" name="token" value="{{ app.token }}"><br>
-  <button>Save</button>
+<form method="POST" action="/applications/{{ app.id }}/edit" class="form">
+    <input type="hidden" name="id" value="{{ app.id }}">
+  <div class="input">
+    <label for="username">Application name:</label>
+    <input type="text" name="name" value="{{ app.name }}" required />
+  </div>
+  <div class="input">
+    <label for="username">Current Long-Lived Access Token:</label>
+    <input type="text" name="token" value="{{ app.token }}" required />
+  </div>
+  <button class="btn">Save</button>
 </form>
