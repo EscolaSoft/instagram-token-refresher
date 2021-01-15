@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { WinstonModule } from 'nest-winston';
 
 import { AppController } from './app.controller';
@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { ApplicationsModule } from './applications/applications.module';
 
 import { APP_WINSTON_CONFIG } from './common/logger/config';
+import { Application } from './entites/application.entity';
 
 @Module({
   imports: [
@@ -18,8 +19,13 @@ import { APP_WINSTON_CONFIG } from './common/logger/config';
     AuthModule,
     ApplicationsModule,
     ScheduleModule.forRoot(),
-    MongooseModule.forRoot(`${process.env.DB_URL}/ig-token-refresher`),
     WinstonModule.forRoot(APP_WINSTON_CONFIG),
+    TypeOrmModule.forRoot({
+      type: 'sqlite',
+      database: `db/${process.env.DB_NAME}`,
+      entities: [Application],
+      synchronize: true,
+    }),
   ],
   controllers: [AppController],
 })

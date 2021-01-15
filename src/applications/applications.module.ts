@@ -1,16 +1,12 @@
 import { HttpModule, Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { ApplicationsService } from './applications.service';
 import { ApplicationsController } from './applications.controller';
-import { MongooseModule } from '@nestjs/mongoose';
-import { Application, ApplicationSchema } from 'src/schemas/application.schema';
+import { Application } from 'src/entites/application.entity';
 
 @Module({
-  imports: [
-    HttpModule,
-    MongooseModule.forFeature([
-      { name: Application.name, schema: ApplicationSchema },
-    ]),
-  ],
+  imports: [HttpModule, TypeOrmModule.forFeature([Application])],
   providers: [ApplicationsService],
   controllers: [ApplicationsController],
   exports: [ApplicationsService],

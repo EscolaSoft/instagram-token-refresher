@@ -4,32 +4,30 @@ import {
   NotFoundException,
   Inject,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { Model } from 'mongoose';
-import {
-  Application,
-  ApplicationDocument,
-} from 'src/schemas/application.schema';
 import { Logger } from 'winston';
 import { CreateAppDto } from './dto/CreateAppDto.dto';
 import { EditAppDto } from './dto/EditAppDto.dto';
 import { InstagramTokenDto } from './dto/InstagramTokenDto';
+import { Application } from 'src/entites/application.entity';
 
 @Injectable()
 export class ApplicationsService {
   constructor(
     private httpService: HttpService,
-    @InjectModel(Application.name) private appModel: Model<ApplicationDocument>,
+    @InjectRepository(Application)
+    private appsRepository: Repository<Application>,
     @Inject('winston') private readonly logger: Logger,
   ) {}
 
   async getAll() {
-    return this.appModel.find().exec();
+    return this.appsRepository.find();
   }
 
   async get(id: string) {
-    const app = await this.appModel.findOne({ _id: id }).exec();
+    const app = await this.appsRepository.findOne(id);
     if (!app) {
       throw new NotFoundException();
     }
@@ -37,7 +35,7 @@ export class ApplicationsService {
   }
 
   async getToken(name: string) {
-    const app = await this.appModel.findOne({ name }).exec();
+    const app = await this.appsRepository.findOne({ where: { name } });
     if (!app) {
       throw new NotFoundException();
     }
@@ -45,15 +43,16 @@ export class ApplicationsService {
   }
 
   async create(newAppDto: CreateAppDto) {
-    const createdApp = new this.appModel(newAppDto);
-    return createdApp.save();
+    newAppDto.name = this.transformName(newAppDto.name);
+    const newApp = this.appsRepository.create(newAppDto);
+    return this.appsRepository.save(newApp);
   }
 
   async edit(id: string, updatedApp: EditAppDto) {
     const app = await this.get(id);
     app.name = this.transformName(updatedApp.name);
     app.token = updatedApp.token || app.token;
-    return app.save();
+    return this.appsRepository.update(app.id, app);
   }
 
   transformName(name: string) {
@@ -61,8 +60,7 @@ export class ApplicationsService {
   }
 
   async delete(id: string) {
-    const app = await this.get(id);
-    return app.delete();
+    return this.appsRepository.delete(id);
   }
 
   /**
@@ -70,7 +68,7 @@ export class ApplicationsService {
    * https://developers.facebook.com/docs/instagram-basic-display-api/guides/long-lived-access-tokens/
    * @param app - app whose token needs to be refreshed
    */
-  async refreshToken(app: ApplicationDocument) {
+  async refreshToken(app: Application) {
     try {
       const response = await this.httpService
         .get<InstagramTokenDto>(
@@ -79,7 +77,7 @@ export class ApplicationsService {
         .toPromise();
 
       app.token = response.data.access_token;
-      await app.save();
+      await this.appsRepository.update(app.id, app);
 
       this.logger.info(`CRON: ${app.name} refresh successfull`);
     } catch (err) {
