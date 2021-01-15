@@ -3,9 +3,9 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { AppModule } from './app.module';
 
-import * as sassMiddleware from 'node-sass-middleware';
 import * as session from 'express-session';
 import * as passport from 'passport';
+import { SESSION_SECRET } from './common/consts';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -16,16 +16,8 @@ async function bootstrap() {
   app.set('view options', { layout: 'main' });
 
   app.use(
-    sassMiddleware({
-      src: join(__dirname, '..', 'scss'),
-      dest: join(__dirname, '..', 'public'),
-      debug: true,
-    }),
-  );
-
-  app.use(
     session({
-      secret: 'secret',
+      secret: SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
     }),

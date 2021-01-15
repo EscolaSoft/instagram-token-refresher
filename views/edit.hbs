@@ -1,7 +1,7 @@
 <form method="POST" action="/applications/{{ app.id }}/edit" class="form">
     <input type="hidden" name="id" value="{{ app.id }}">
   <div class="input">
-    <label for="username">Application name:</label>
+    <label for="username">Application name: <code>snake-case</code></label>
     <input type="text" name="name" value="{{ app.name }}" required />
   </div>
   <div class="input">
@@ -10,3 +10,10 @@
   </div>
   <button class="btn">Save</button>
 </form>
+
+<br>
+<br>
+<br>
+<br>
+
+<a href="/home" class="btn btn--centered btn--gray">Back</a>

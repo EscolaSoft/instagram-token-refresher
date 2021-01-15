@@ -68,6 +68,16 @@ a {
     color: #fff;
     background-color: $primaryColor;
   }
+
+  &--centered {
+    width: 160px;
+    margin: 0 auto;
+  }
+
+  &--gray {
+    background-color: #ddd;
+    color: #333;
+  }
 }
 
 .apps {
@@ -113,11 +123,6 @@ a {
 .add-btn {
   width: 200px;
   margin-left: auto;
-}
-
-.logout-btn {
-  width: 160px;
-  margin: 0 auto;
 }
 
 .input {
