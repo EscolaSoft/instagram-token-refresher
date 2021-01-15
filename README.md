@@ -12,6 +12,9 @@ $ yarn
 ## Running the app
 
 ```bash
+# copy env file
+$ cp .env.dev .env
+
 # development
 $ yarn start
 # or: npm run start
@@ -39,6 +42,9 @@ $ yarn scss:watch
 ```bash
 # build the app
 $ yarn build
+
+# copy env file
+$ cp .env.prod .env
 
 # start in production mode
 $ yarn start:prod

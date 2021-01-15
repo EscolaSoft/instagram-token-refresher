@@ -12,8 +12,8 @@ export class UsersService {
   private readonly users: User[] = [
     {
       id: 1,
-      username: 'admin',
-      password: 'password',
+      username: process.env.ADMIN_USERNAME,
+      password: process.env.ADMIN_PASSWORD,
     },
   ];
 

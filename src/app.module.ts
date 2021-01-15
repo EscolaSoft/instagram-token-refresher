@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MongooseModule } from '@nestjs/mongoose';
 import { WinstonModule } from 'nest-winston';
@@ -12,6 +13,7 @@ import { APP_WINSTON_CONFIG } from './common/logger/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     UsersModule,
     AuthModule,
     ApplicationsModule,

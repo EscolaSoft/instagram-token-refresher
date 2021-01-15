@@ -5,7 +5,6 @@ import { AppModule } from './app.module';
 
 import * as session from 'express-session';
 import * as passport from 'passport';
-import { SESSION_SECRET } from './common/consts';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -17,7 +16,7 @@ async function bootstrap() {
 
   app.use(
     session({
-      secret: SESSION_SECRET,
+      secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
     }),
