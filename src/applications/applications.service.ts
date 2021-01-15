@@ -4,38 +4,30 @@ import {
   NotFoundException,
   Logger,
 } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { Model } from 'mongoose';
+import {
+  Application,
+  ApplicationDocument,
+} from 'src/schemas/application.schema';
 import { CreateAppDto } from './dto/CreateAppDto.dto';
 import { EditAppDto } from './dto/EditAppDto.dto';
 import { InstagramTokenDto } from './dto/InstagramTokenDto';
 
-export interface Application {
-  id: number;
-  name: string;
-  token: string;
-  createdAt: number;
-}
-
 @Injectable()
 export class ApplicationsService {
-  // TODO: database
-  private applications: Application[] = [
-    {
-      id: 0,
-      name: 'lw',
-      token: 'asdasd212',
-      createdAt: 0,
-    },
-  ];
-
-  constructor(private httpService: HttpService) {}
+  constructor(
+    private httpService: HttpService,
+    @InjectModel(Application.name) private appModel: Model<ApplicationDocument>,
+  ) {}
 
   async getAll() {
-    return this.applications;
+    return this.appModel.find().exec();
   }
 
-  async get(id: number) {
-    const app = this.applications.find((app) => app.id === id);
+  async get(id: string) {
+    const app = await this.appModel.findOne({ _id: id }).exec();
     if (!app) {
       throw new NotFoundException();
     }
@@ -43,37 +35,32 @@ export class ApplicationsService {
   }
 
   async getToken(name: string) {
-    const app = this.applications.find((app) => app.name === name);
+    const app = await this.appModel.findOne({ name }).exec();
     if (!app) {
       throw new NotFoundException();
     }
     return app.token;
   }
 
-  async create(newApp: CreateAppDto) {
-    const app = {
-      id: Math.round(Math.random() * 1000),
-      name: this.transformName(newApp.name),
-      token: newApp.token,
-      createdAt: Date.now(),
-    };
-    this.applications.push(app);
-    return app;
+  async create(newAppDto: CreateAppDto) {
+    const createdApp = new this.appModel(newAppDto);
+    return createdApp.save();
   }
 
-  async edit(id: number, updatedApp: EditAppDto) {
+  async edit(id: string, updatedApp: EditAppDto) {
     const app = await this.get(id);
     app.name = this.transformName(updatedApp.name);
     app.token = updatedApp.token || app.token;
-    return app;
+    return app.save();
   }
 
   transformName(name: string) {
     return name.toLowerCase().replace(/\s/, '-');
   }
 
-  async delete(id: number) {
-    this.applications = this.applications.filter((app) => app.id !== id);
+  async delete(id: string) {
+    const app = await this.get(id);
+    return app.delete();
   }
 
   /**
@@ -81,7 +68,7 @@ export class ApplicationsService {
    * https://developers.facebook.com/docs/instagram-basic-display-api/guides/long-lived-access-tokens/
    * @param app - app whose token needs to be refreshed
    */
-  async refreshToken(app: Application) {
+  async refreshToken(app: ApplicationDocument) {
     try {
       const response = await this.httpService
         .get<InstagramTokenDto>(
@@ -90,6 +77,7 @@ export class ApplicationsService {
         .toPromise();
 
       app.token = response.data.access_token;
+      await app.save();
       Logger.log(`CRON: Refreshed ${app.name} token`);
     } catch (err) {
       Logger.error(`CRON: ${app.name} refresh failed!`);
@@ -97,7 +85,7 @@ export class ApplicationsService {
     }
   }
 
-  @Cron(CronExpression.EVERY_WEEK)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async refreshTokens() {
     Logger.log('CRON: Started token refresh');
     const apps = await this.getAll();

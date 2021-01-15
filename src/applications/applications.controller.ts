@@ -20,14 +20,18 @@ export class ApplicationsController {
   @UseGuards(AuthenticatedGuard)
   @Post(':id/delete')
   async handleDelete(@Param('id') id: string, @Res() res) {
-    await this.applicationsService.delete(parseInt(id, 10));
+    await this.applicationsService.delete(id);
     res.redirect('/home');
   }
 
   @UseGuards(AuthenticatedGuard)
   @Post(':id/edit')
-  async handleEdit(@Param('id') id, @Body() app: EditAppDto, @Res() res) {
-    await this.applicationsService.edit(parseInt(id, 10), app);
+  async handleEdit(
+    @Param('id') id: string,
+    @Body() app: EditAppDto,
+    @Res() res,
+  ) {
+    await this.applicationsService.edit(id, app);
     res.redirect('/home');
   }
 
@@ -48,8 +52,8 @@ export class ApplicationsController {
   @Get(':name/token.js')
   async getTokenFile(@Param('name') name, @Query('variable') variable) {
     const varName = variable || 'InstagramToken';
-    return `
-      const ${varName} = '${await this.applicationsService.getToken(name)}';
-    `;
+    return `const ${varName} = '${await this.applicationsService.getToken(
+      name,
+    )}';`;
   }
 }

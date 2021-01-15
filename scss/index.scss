@@ -75,6 +75,19 @@ a {
   flex-direction: column;
   list-style: none;
   padding: 0;
+  position: relative;
+  min-height: 40px;
+
+  &:empty::before {
+    position: absolute;
+    content: 'There are no applications added!';
+    color: #888;
+    display: block;
+    left: 50%;
+    top: 50%;
+    font-size: 0.8em;
+    transform: translate(-50%, -50%);
+  }
 
   li {
     display: flex;

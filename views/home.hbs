@@ -1,14 +1,12 @@
 <h2>Applications list</h2>
 <a href="/add" class="btn add-btn">Add new application</a>
-<ul class="apps">
-  {{#each apps}}
+<ul class="apps">{{#each apps}}
     <li>
       <b>{{ this.name }}</b>
       <a href="/edit/{{ this.id }}" class="btn btn--action">Edit</a>
       <form method="post" action="/applications/{{ this.id }}/delete"><button class="btn btn--action">Delete</button></form>
     </li>
-  {{/each}}
-</ul>
+  {{/each}}</ul>
 
 <p>
   You can get the access token using following techniques:<br/>

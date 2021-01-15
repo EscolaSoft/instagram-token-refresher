@@ -46,9 +46,9 @@ export class AppController {
   @UseGuards(AuthenticatedGuard)
   @Get('edit/:id')
   @Render('edit')
-  async edit(@Param('id') id) {
+  async edit(@Param('id') id: string) {
     return {
-      app: await this.applicationsService.get(parseInt(id, 10)),
+      app: await this.applicationsService.get(id),
     };
   }
 
