@@ -2,7 +2,7 @@ import {
   HttpService,
   Injectable,
   NotFoundException,
-  Logger,
+  Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cron, CronExpression } from '@nestjs/schedule';
@@ -11,6 +11,7 @@ import {
   Application,
   ApplicationDocument,
 } from 'src/schemas/application.schema';
+import { Logger } from 'winston';
 import { CreateAppDto } from './dto/CreateAppDto.dto';
 import { EditAppDto } from './dto/EditAppDto.dto';
 import { InstagramTokenDto } from './dto/InstagramTokenDto';
@@ -20,6 +21,7 @@ export class ApplicationsService {
   constructor(
     private httpService: HttpService,
     @InjectModel(Application.name) private appModel: Model<ApplicationDocument>,
+    @Inject('winston') private readonly logger: Logger,
   ) {}
 
   async getAll() {
@@ -78,20 +80,21 @@ export class ApplicationsService {
 
       app.token = response.data.access_token;
       await app.save();
-      Logger.log(`CRON: Refreshed ${app.name} token`);
+
+      this.logger.info(`CRON: ${app.name} refresh successfull`);
     } catch (err) {
-      Logger.error(`CRON: ${app.name} refresh failed!`);
-      Logger.error(err);
+      this.logger.error(`CRON: ${app.name} refresh failed!`);
+      this.logger.error(err.toString());
     }
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_WEEK)
   async refreshTokens() {
-    Logger.log('CRON: Started token refresh');
+    this.logger.info('CRON: Started token refresh');
     const apps = await this.getAll();
 
     await Promise.all(apps.map((app) => this.refreshToken(app)));
 
-    Logger.log('CRON: Finished token refresh');
+    this.logger.info('CRON: Finished token refresh');
   }
 }
