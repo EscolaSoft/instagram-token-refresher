@@ -1,6 +1,6 @@
 # Instagram Token Refresher
 
-Serwis odświeżający regularnie `LongLived Access Tokeny` instagrama
+Simple service that auto refreshes Instagram Long-Lived Tokens (refresh is once a week)
 
 ## Installation
 
