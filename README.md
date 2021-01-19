@@ -66,3 +66,24 @@ $ npm run test:cov
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+
+## Deploy on `heroku`
+
+Create your heroku app in heroku panel [apps](https://dashboard.heroku.com/apps)
+
+In settings section add Config Vars
+
+```env
+SESSION_SECRET=secret
+DB_NAME=ig-token-refresher
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=password
+```
+
+Then push the app do either `main` or `master` branch with heroku CLI.
+
+1. `heroku login`
+2. `heroku git:remote -a XXX` XXX you will get from you app panel
+3. `git push heroku master`
+
+That's it - console should return URL of your app.
