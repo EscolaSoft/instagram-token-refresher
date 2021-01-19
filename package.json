@@ -5,6 +5,9 @@
   "author": "Escola",
   "private": true,
   "license": "UNLICENSED",
+  "engines": {
+    "node": "14.x"
+  },
   "scripts": {
     "docker": "docker-compose up -d --build -V",
     "prebuild": "rimraf dist && yarn scss",
